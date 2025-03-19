@@ -5,7 +5,7 @@ FROM golang:1.23-alpine AS builder
 WORKDIR /app
 
 # Copy the Go module files
-COPY go.mod go.sum ./
+COPY ../go.mod ../go.sum ./
 
 # Download dependencies
 RUN go mod download
@@ -26,7 +26,7 @@ WORKDIR /root/
 COPY --from=builder /app/company-service .
 
 # Copy configuration files (if any)
-COPY .env .
+COPY ../.env .
 
 # Expose the application port
 EXPOSE 8080
