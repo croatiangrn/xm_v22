@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	httpController "github.com/croatiangrn/xm_v22/internal/controller/http"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/config"
@@ -8,6 +9,7 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/http"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/repository"
 	"github.com/croatiangrn/xm_v22/internal/usecase/company"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"log"
 )
 
@@ -25,8 +27,12 @@ func main() {
 		return
 	}
 
-	// Initialize repository
-	companyRepo := repository.NewCompanyRepository(db)
+	dbPgxPool, err := pgxpool.New(context.Background(), postgresDSN)
+	if err != nil {
+		log.Fatalf("Failed to create connection pool: %v", err)
+	}
+
+	companyRepo := repository.NewCompanyRepository(dbPgxPool)
 	companyUseCase := company.NewInteractor(companyRepo)
 	companyHandler := httpController.NewCompanyHandler(companyUseCase)
 

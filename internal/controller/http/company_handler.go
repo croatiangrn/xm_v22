@@ -27,7 +27,7 @@ func (h *CompanyHandler) GetCompany(c *gin.Context) {
 }
 
 func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
-
+	
 }
 
 func (h *CompanyHandler) CompanyGet(c *gin.Context) {
@@ -39,5 +39,5 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 }
 
 func (h *CompanyHandler) CompanyDelete(c *gin.Context) {
-	
+
 }
