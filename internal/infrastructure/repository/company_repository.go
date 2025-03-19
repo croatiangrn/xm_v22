@@ -17,7 +17,7 @@ func NewCompanyRepository(db *pgxpool.Pool) company.Repository {
 	return &CompanyRepository{db}
 }
 
-func (r *CompanyRepository) FindByID(ctx context.Context, id string) (*company.Company, error) {
+func (r *CompanyRepository) FindByID(ctx context.Context, id uuid.UUID) (*company.Company, error) {
 	var c company.Company
 
 	query := `SELECT id, name, description, amount_of_employees, registered, type FROM companies WHERE id = $1`
@@ -50,6 +50,16 @@ func (r *CompanyRepository) Update(ctx context.Context, obj *company.Company) er
 	query := `UPDATE companies SET name = $1, description = $2, amount_of_employees = $3, registered = $4, type = $5 WHERE id = $6`
 
 	if _, err := r.db.Exec(ctx, query, obj.Name, obj.Description, obj.AmountOfEmployees, obj.Registered, obj.Type, obj.ID); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (r *CompanyRepository) Delete(ctx context.Context, id uuid.UUID) error {
+	query := `DELETE FROM companies WHERE id = $1`
+
+	if _, err := r.db.Exec(ctx, query, id); err != nil {
 		return err
 	}
 
