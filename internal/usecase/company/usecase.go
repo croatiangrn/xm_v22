@@ -9,4 +9,5 @@ import (
 type UseCase interface {
 	GetCompany(ctx context.Context, id string) (*company.Company, error)
 	CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*company.Company, error)
+	UpdateCompany(ctx context.Context, obj *company.Company, req dto.UpdateCompanyRequest) error
 }

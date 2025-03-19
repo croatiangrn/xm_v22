@@ -45,3 +45,13 @@ func (r *CompanyRepository) Create(ctx context.Context, c *company.Company) erro
 
 	return nil
 }
+
+func (r *CompanyRepository) Update(ctx context.Context, obj *company.Company) error {
+	query := `UPDATE companies SET name = $1, description = $2, amount_of_employees = $3, registered = $4, type = $5 WHERE id = $6`
+
+	if _, err := r.db.Exec(ctx, query, obj.Name, obj.Description, obj.AmountOfEmployees, obj.Registered, obj.Type, obj.ID); err != nil {
+		return err
+	}
+
+	return nil
+}

@@ -46,7 +46,28 @@ func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
 }
 
 func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
+	id := c.Param("id")
+	ctx := c.Request.Context()
 
+	companyObj, err := h.uc.GetCompany(ctx, id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Company not found"})
+		return
+	}
+
+	var req dto.UpdateCompanyRequest
+
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	if err := h.uc.UpdateCompany(ctx, companyObj, req); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusCreated, companyObj)
 }
 
 func (h *CompanyHandler) CompanyDelete(c *gin.Context) {

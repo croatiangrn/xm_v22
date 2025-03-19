@@ -35,9 +35,27 @@ func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRe
 		return nil, err
 	}
 
-	if err := uc.producer.Publish(ctx, "company-events", companyObj); err != nil {
+	if err := uc.producer.Publish(ctx, "company-events", kafka.EventTypeCreateCompany, companyObj); err != nil {
 		return nil, err
 	}
 
 	return companyObj, nil
+}
+
+func (uc *Interactor) UpdateCompany(ctx context.Context, companyObj *company.Company, req dto.UpdateCompanyRequest) error {
+	companyObj.Name = req.Name
+	companyObj.Description = req.Description
+	companyObj.AmountOfEmployees = req.AmountOfEmployees
+	companyObj.Registered = req.Registered
+	companyObj.Type = req.Type
+
+	if err := uc.repo.Update(ctx, companyObj); err != nil {
+		return err
+	}
+
+	if err := uc.producer.Publish(ctx, "company-events", kafka.EventTypeUpdateCompany, companyObj); err != nil {
+		return err
+	}
+
+	return nil
 }

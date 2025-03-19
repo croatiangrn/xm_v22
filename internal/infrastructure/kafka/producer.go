@@ -7,6 +7,18 @@ import (
 	"log"
 )
 
+type EventType string
+
+const (
+	EventTypeCreateCompany EventType = "company.created"
+	EventTypeUpdateCompany EventType = "company.updated"
+)
+
+type CompanyEvent struct {
+	Type    EventType `json:"type"`
+	Payload any       `json:"payload"`
+}
+
 type Producer struct {
 	writer *kafka.Writer
 }
@@ -58,8 +70,13 @@ func createTopicIfNotExists(conn *kafka.Conn, topic string) {
 	}
 }
 
-func (p *Producer) Publish(ctx context.Context, key string, value interface{}) error {
-	valueBytes, err := json.Marshal(value)
+func (p *Producer) Publish(ctx context.Context, key string, eventType EventType, value interface{}) error {
+	req := &CompanyEvent{
+		Type:    eventType,
+		Payload: value,
+	}
+
+	valueBytes, err := json.Marshal(req)
 	if err != nil {
 		return err
 	}
