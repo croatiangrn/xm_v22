@@ -39,7 +39,6 @@ func JWTAuthMiddleware(secret string) gin.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			// Check if the claims contain the expected fields
 			id, ok := claims["id"].(float64)
 			if !ok {
 				log.Println("ID is missing or is not of type float64")
@@ -54,20 +53,11 @@ func JWTAuthMiddleware(secret string) gin.HandlerFunc {
 				return
 			}
 
-			role, ok := claims["role"].(string)
-			if !ok {
-				log.Println("Role is missing or is not of type string")
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
-				return
-			}
-
 			userObj := auth.User{
 				ID:    int64(id),
 				Email: email,
-				Role:  role,
 			}
 
-			// Set the user object in the context
 			c.Set("auth", userObj)
 		} else {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
