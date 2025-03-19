@@ -15,7 +15,7 @@ func NewCompanyHandler(uc company.UseCase) *CompanyHandler {
 	return &CompanyHandler{uc}
 }
 
-func (h *CompanyHandler) GetCompany(c *gin.Context) {
+func (h *CompanyHandler) CompanyGet(c *gin.Context) {
 	id := c.Param("id")
 	ctx := c.Request.Context()
 
@@ -43,10 +43,6 @@ func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, company)
-}
-
-func (h *CompanyHandler) CompanyGet(c *gin.Context) {
-
 }
 
 func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
