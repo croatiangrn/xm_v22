@@ -19,7 +19,7 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	postgresDSN := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBName, cfg.DBPassword)
+	postgresDSN := fmt.Sprintf("host=%s port=%s auth=%s dbname=%s password=%s sslmode=disable", cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBName, cfg.DBPassword)
 
 	gormDB := database.NewGormDB(postgresDSN)
 	if err := database.AutoMigrate(gormDB); err != nil {

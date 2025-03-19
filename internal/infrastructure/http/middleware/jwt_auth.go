@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/croatiangrn/xm_v22/internal/domain/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"net/http"
@@ -37,7 +38,12 @@ func JWTAuthMiddleware(secret string) gin.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			c.Set("is_logged_in", claims["userID"])
+			userObj := auth.User{
+				ID:    int64(claims["id"].(float64)),
+				Email: claims["email"].(string),
+				Role:  claims["role"].(string),
+			}
+			c.Set("auth", userObj)
 		}
 
 		c.Next()
