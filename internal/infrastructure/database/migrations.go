@@ -1,41 +1,29 @@
 package database
 
 import (
-	"github.com/croatiangrn/xm_v22/internal/domain/company"
-	"gorm.io/gorm"
+	"errors"
+	"fmt"
+	"github.com/golang-migrate/migrate/v4"
+	"github.com/golang-migrate/migrate/v4/database/pgx"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
-func createEnumTypes(db *gorm.DB) error {
-	var exists bool
-	err := db.Raw(`
-        SELECT EXISTS (
-            SELECT 1 FROM pg_type WHERE typname = 'company_type'
-        );
-    `).Scan(&exists).Error
+// RunMigrations applies database migrations using SQL files.
+func RunMigrations(dsn, migrationsPath string) error {
+	p := &pgx.Postgres{}
+	d, err := p.Open(dsn)
+
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to open database connection: %w", err)
 	}
 
-	if !exists {
-		err = db.Exec(`
-            CREATE TYPE company_type AS ENUM (
-                'Corporations', 'NonProfit', 'Cooperative', 'Sole Proprietorship'
-            );
-        `).Error
-		if err != nil {
-			return err
-		}
+	m, err := migrate.NewWithDatabaseInstance(migrationsPath, "pgx", d)
+	if err != nil {
+		return fmt.Errorf("failed to create migrate instance: %w", err)
 	}
 
-	return nil
-}
-func AutoMigrate(db *gorm.DB) error {
-	if err := createEnumTypes(db); err != nil {
-		return err
-	}
-
-	if err := db.AutoMigrate(&company.Company{}); err != nil {
-		return err
+	if err := m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
+		return fmt.Errorf("failed to apply migrations: %w", err)
 	}
 
 	return nil

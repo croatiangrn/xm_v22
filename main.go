@@ -20,14 +20,11 @@ func main() {
 		log.Fatalf("Failed to load config: %v", err)
 	}
 
-	postgresDSN := fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable", cfg.DBHost, cfg.DBPort, cfg.DBUser, cfg.DBName, cfg.DBPassword)
-	gormDB := database.NewGormDB(postgresDSN)
-	if err := database.AutoMigrate(gormDB); err != nil {
-		log.Fatalf("Failed to migrate database: %v", err)
-		return
+	dbPgxPoolDSN := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
+	if err := database.RunMigrations(dbPgxPoolDSN, "file://migrations"); err != nil {
+		log.Printf("Failed to run migrations: %v", err)
 	}
 
-	dbPgxPoolDSN := fmt.Sprintf("postgresql://%s:%s@%s:%s/%s?sslmode=disable", cfg.DBUser, cfg.DBPassword, cfg.DBHost, cfg.DBPort, cfg.DBName)
 	dbPgxPool, err := pgxpool.New(context.Background(), dbPgxPoolDSN)
 	if err != nil {
 		log.Fatalf("Failed to create connection pool: %v", err)

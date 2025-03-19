@@ -25,6 +25,9 @@ WORKDIR /root/
 # Copy the binary from the builder stage
 COPY --from=builder /app/company-service .
 
+# Copy the migrations directory
+COPY --from=builder /app/migrations /root/migrations
+
 # Copy configuration files (if any)
 COPY ../.env .
 
