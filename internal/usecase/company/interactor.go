@@ -2,9 +2,11 @@ package company
 
 import (
 	"context"
+	"fmt"
 	"github.com/croatiangrn/xm_v22/internal/controller/http/dto"
 	"github.com/croatiangrn/xm_v22/internal/domain/company"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/kafka"
+	"github.com/google/uuid"
 )
 
 var _ UseCase = &Interactor{}
@@ -18,7 +20,7 @@ func NewInteractor(repo company.Repository, producer *kafka.Producer) *Interacto
 	return &Interactor{repo: repo, producer: producer}
 }
 
-func (uc *Interactor) GetCompany(ctx context.Context, id string) (*company.Company, error) {
+func (uc *Interactor) GetCompany(ctx context.Context, id uuid.UUID) (*company.Company, error) {
 	return uc.repo.FindByID(ctx, id)
 }
 
@@ -54,6 +56,18 @@ func (uc *Interactor) UpdateCompany(ctx context.Context, companyObj *company.Com
 	}
 
 	if err := uc.producer.Publish(ctx, "company-events", kafka.EventTypeUpdateCompany, companyObj); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (uc *Interactor) DeleteCompany(ctx context.Context, id uuid.UUID) error {
+	if err := uc.repo.Delete(ctx, id); err != nil {
+		return fmt.Errorf("error deleting company: %w", err)
+	}
+
+	if err := uc.producer.Publish(ctx, "company-events", kafka.EventTypeDeleteCompany, &company.Company{ID: id}); err != nil {
 		return err
 	}
 

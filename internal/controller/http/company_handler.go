@@ -4,6 +4,7 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/controller/http/dto"
 	"github.com/croatiangrn/xm_v22/internal/usecase/company"
 	"github.com/gin-gonic/gin"
+	"github.com/google/uuid"
 	"net/http"
 )
 
@@ -17,9 +18,15 @@ func NewCompanyHandler(uc company.UseCase) *CompanyHandler {
 
 func (h *CompanyHandler) CompanyGet(c *gin.Context) {
 	id := c.Param("id")
+	idAsUUID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
 	ctx := c.Request.Context()
 
-	comp, err := h.uc.GetCompany(ctx, id)
+	comp, err := h.uc.GetCompany(ctx, idAsUUID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Company not found"})
 		return
@@ -47,9 +54,16 @@ func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
 
 func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 	id := c.Param("id")
+
+	idAsUUID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
 	ctx := c.Request.Context()
 
-	companyObj, err := h.uc.GetCompany(ctx, id)
+	companyObj, err := h.uc.GetCompany(ctx, idAsUUID)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Company not found"})
 		return
@@ -71,5 +85,19 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 }
 
 func (h *CompanyHandler) CompanyDelete(c *gin.Context) {
+	id := c.Param("id")
+	ctx := c.Request.Context()
 
+	idAsUUID, err := uuid.Parse(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	if err := h.uc.DeleteCompany(ctx, idAsUUID); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusNoContent, nil)
 }

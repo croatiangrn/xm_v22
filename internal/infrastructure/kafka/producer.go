@@ -12,6 +12,7 @@ type EventType string
 const (
 	EventTypeCreateCompany EventType = "company.created"
 	EventTypeUpdateCompany EventType = "company.updated"
+	EventTypeDeleteCompany EventType = "company.deleted"
 )
 
 type CompanyEvent struct {
