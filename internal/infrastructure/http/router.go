@@ -23,5 +23,8 @@ func InitRouter(companyHandler *httpController.CompanyHandler, cfg config.Config
 	}
 
 	// Run the server
-	router.Run(cfg.ServerPort)
+	err := router.Run(cfg.ServerPort)
+	if err != nil {
+		return
+	}
 }
