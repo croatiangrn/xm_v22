@@ -1,0 +1,15 @@
+package database
+
+import (
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"log"
+)
+
+func NewGormDB(dsn string) *gorm.DB {
+	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("failed to connect database: %v", err)
+	}
+	return db
+}
