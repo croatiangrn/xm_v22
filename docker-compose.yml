@@ -43,6 +43,8 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       KAFKA_BROKERS: ${KAFKA_BROKERS}
       KAFKA_TOPIC: ${KAFKA_TOPIC}
+    volumes:
+      - .env:/app/.env
     depends_on:
       postgres:
         condition: service_healthy
