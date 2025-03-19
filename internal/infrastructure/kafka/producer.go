@@ -3,21 +3,14 @@ package kafka
 import (
 	"context"
 	"encoding/json"
+	"github.com/croatiangrn/xm_v22/internal/domain/event"
 	"github.com/segmentio/kafka-go"
 	"log"
 )
 
-type EventType string
-
-const (
-	EventTypeCreateCompany EventType = "company.created"
-	EventTypeUpdateCompany EventType = "company.updated"
-	EventTypeDeleteCompany EventType = "company.deleted"
-)
-
 type CompanyEvent struct {
-	Type    EventType `json:"type"`
-	Payload any       `json:"payload"`
+	Type    event.EventType `json:"type"`
+	Payload any             `json:"payload"`
 }
 
 type Producer struct {
@@ -71,7 +64,7 @@ func createTopicIfNotExists(conn *kafka.Conn, topic string) {
 	}
 }
 
-func (p *Producer) Publish(ctx context.Context, key string, eventType EventType, value interface{}) error {
+func (p *Producer) Publish(ctx context.Context, key string, eventType event.EventType, value interface{}) error {
 	req := &CompanyEvent{
 		Type:    eventType,
 		Payload: value,

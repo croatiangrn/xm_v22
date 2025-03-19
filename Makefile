@@ -12,7 +12,7 @@ stop: ##Stop containers
 	$(DOCKER_COMPOSE) stop
 
 restart: ##Restart running containers
-	make stop make start
+	make stop && make start
 
 tests: ##Run tests locally
 	go test -v ./...
