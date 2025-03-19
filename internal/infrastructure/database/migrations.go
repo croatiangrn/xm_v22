@@ -6,7 +6,6 @@ import (
 )
 
 func createEnumTypes(db *gorm.DB) error {
-	// Check if the enum type already exists
 	var exists bool
 	err := db.Raw(`
         SELECT EXISTS (
@@ -17,7 +16,6 @@ func createEnumTypes(db *gorm.DB) error {
 		return err
 	}
 
-	// If the enum type doesn't exist, create it
 	if !exists {
 		err = db.Exec(`
             CREATE TYPE company_type AS ENUM (
