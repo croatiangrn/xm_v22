@@ -4,6 +4,7 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/domain/auth"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -38,12 +39,39 @@ func JWTAuthMiddleware(secret string) gin.HandlerFunc {
 		}
 
 		if claims, ok := token.Claims.(jwt.MapClaims); ok {
-			userObj := auth.User{
-				ID:    int64(claims["id"].(float64)),
-				Email: claims["email"].(string),
-				Role:  claims["role"].(string),
+			// Check if the claims contain the expected fields
+			id, ok := claims["id"].(float64)
+			if !ok {
+				log.Println("ID is missing or is not of type float64")
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+				return
 			}
+
+			email, ok := claims["email"].(string)
+			if !ok {
+				log.Println("Email is missing or is not of type string")
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+				return
+			}
+
+			role, ok := claims["role"].(string)
+			if !ok {
+				log.Println("Role is missing or is not of type string")
+				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+				return
+			}
+
+			userObj := auth.User{
+				ID:    int64(id),
+				Email: email,
+				Role:  role,
+			}
+
+			// Set the user object in the context
 			c.Set("auth", userObj)
+		} else {
+			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+			return
 		}
 
 		c.Next()

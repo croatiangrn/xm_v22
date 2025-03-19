@@ -21,7 +21,7 @@ func createEnumTypes(db *gorm.DB) error {
 	if !exists {
 		err = db.Exec(`
             CREATE TYPE company_type AS ENUM (
-                'corporations', 'non_profit', 'cooperative', 'sole_proprietorship'
+                'Corporations', 'NonProfit', 'Cooperative', 'Sole Proprietorship'
             );
         `).Error
 		if err != nil {

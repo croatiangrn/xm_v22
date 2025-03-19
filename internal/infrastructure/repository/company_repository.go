@@ -3,8 +3,11 @@ package repository
 import (
 	"context"
 	"github.com/croatiangrn/xm_v22/internal/domain/company"
+	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
+
+var _ company.Repository = &CompanyRepository{}
 
 type CompanyRepository struct {
 	db *pgxpool.Pool
@@ -24,4 +27,21 @@ func (r *CompanyRepository) FindByID(ctx context.Context, id string) (*company.C
 	}
 
 	return &c, nil
+}
+
+func (r *CompanyRepository) Create(ctx context.Context, c *company.Company) error {
+	query := `INSERT INTO companies (id, name, description, amount_of_employees, registered, type) VALUES ($1, $2, $3, $4, $5, $6)`
+
+	companyUUID, err := uuid.NewV7()
+	if err != nil {
+		return err
+	}
+
+	if _, err := r.db.Exec(ctx, query, companyUUID, c.Name, c.Description, c.AmountOfEmployees, c.Registered, c.Type); err != nil {
+		return err
+	}
+
+	c.ID = companyUUID
+
+	return nil
 }

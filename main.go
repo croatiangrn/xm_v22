@@ -34,7 +34,6 @@ func main() {
 	}
 
 	kafkaProducer := kafka.NewProducer([]string{cfg.KafkaBrokers}, cfg.KafkaTopic)
-	defer kafkaProducer.Close()
 
 	companyRepo := repository.NewCompanyRepository(dbPgxPool)
 	companyUseCase := company.NewInteractor(companyRepo, kafkaProducer)

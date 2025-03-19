@@ -11,19 +11,15 @@ import (
 func InitRouter(companyHandler *httpController.CompanyHandler, cfg config.Config) {
 	router := gin.Default()
 
-	// Define the route
-	router.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello, World!",
-		})
-	})
-
-	companiesAPI := router.Group("/companies", middleware.JWTAuthMiddleware(cfg.JWTSecret))
+	v1API := router.Group("/v1")
 	{
-		companiesAPI.POST("", companyHandler.CompanyCreate)
-		companiesAPI.GET("/:id", companyHandler.CompanyGet)
-		companiesAPI.PUT("/:id", companyHandler.CompanyUpdate)
-		companiesAPI.DELETE("/:id", companyHandler.CompanyDelete)
+		companiesAPI := v1API.Group("/companies", middleware.JWTAuthMiddleware(cfg.JWTSecret))
+		{
+			companiesAPI.POST("", companyHandler.CompanyCreate)
+			companiesAPI.GET("/:id", companyHandler.CompanyGet)
+			companiesAPI.PUT("/:id", companyHandler.CompanyUpdate)
+			companiesAPI.DELETE("/:id", companyHandler.CompanyDelete)
+		}
 	}
 
 	// Run the server
