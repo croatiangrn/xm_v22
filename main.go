@@ -7,6 +7,7 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/config"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/database"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/http"
+	"github.com/croatiangrn/xm_v22/internal/infrastructure/kafka"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/repository"
 	"github.com/croatiangrn/xm_v22/internal/usecase/company"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -32,8 +33,11 @@ func main() {
 		log.Fatalf("Failed to create connection pool: %v", err)
 	}
 
+	kafkaProducer := kafka.NewProducer([]string{cfg.KafkaBrokers}, cfg.KafkaTopic)
+	defer kafkaProducer.Close()
+
 	companyRepo := repository.NewCompanyRepository(dbPgxPool)
-	companyUseCase := company.NewInteractor(companyRepo)
+	companyUseCase := company.NewInteractor(companyRepo, kafkaProducer)
 	companyHandler := httpController.NewCompanyHandler(companyUseCase)
 
 	http.InitRouter(companyHandler, cfg)
