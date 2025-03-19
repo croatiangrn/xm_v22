@@ -36,13 +36,13 @@ func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
 	}
 
 	ctx := c.Request.Context()
-	company, err := h.uc.CreateCompany(ctx, req)
+	companyObj, err := h.uc.CreateCompany(ctx, req)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, company)
+	c.JSON(http.StatusCreated, companyObj)
 }
 
 func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
