@@ -2,9 +2,12 @@ package main
 
 import (
 	"fmt"
+	httpController "github.com/croatiangrn/xm_v22/internal/controller/http"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/config"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/database"
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/http"
+	"github.com/croatiangrn/xm_v22/internal/infrastructure/repository"
+	"github.com/croatiangrn/xm_v22/internal/usecase/company"
 	"log"
 )
 
@@ -22,5 +25,10 @@ func main() {
 		return
 	}
 
-	http.InitRouter(cfg)
+	// Initialize repository
+	companyRepo := repository.NewCompanyRepository(db)
+	companyUseCase := company.NewInteractor(companyRepo)
+	companyHandler := httpController.NewCompanyHandler(companyUseCase)
+
+	http.InitRouter(companyHandler, cfg)
 }
