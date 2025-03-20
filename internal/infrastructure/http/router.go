@@ -26,12 +26,12 @@ func InitRouter(
 			loginAPI.POST("", loginHandler.Login(cfg.JWTSecret))
 		}
 
-		companiesAPI := v1API.Group("/companies", middleware.JWTAuthMiddleware(cfg.JWTSecret))
+		companiesAPI := v1API.Group("/companies")
 		{
-			companiesAPI.POST("", companyHandler.CompanyCreate)
+			companiesAPI.POST("", middleware.JWTAuthMiddleware(cfg.JWTSecret), companyHandler.CompanyCreate)
 			companiesAPI.GET("/:id", companyHandler.CompanyGet)
-			companiesAPI.PATCH("/:id", companyHandler.CompanyUpdate)
-			companiesAPI.DELETE("/:id", companyHandler.CompanyDelete)
+			companiesAPI.PATCH("/:id", middleware.JWTAuthMiddleware(cfg.JWTSecret), companyHandler.CompanyUpdate)
+			companiesAPI.DELETE("/:id", middleware.JWTAuthMiddleware(cfg.JWTSecret), companyHandler.CompanyDelete)
 		}
 	}
 
