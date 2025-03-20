@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	customErrors "github.com/croatiangrn/xm_v22/internal/pkg/errors"
 	"github.com/google/uuid"
+	"github.com/rs/zerolog"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +25,10 @@ func TestCompanyCreate(t *testing.T) {
 
 	// Create a mock use case
 	mockUC := new(mocks.UseCase)
-	h := NewCompanyHandler(mockUC)
+	var buf bytes.Buffer
+	zeroLog := zerolog.New(&buf).With().Timestamp().Logger()
+	
+	h := NewCompanyHandler(mockUC, zeroLog)
 
 	// Create a Gin router and register the handler
 	router := gin.Default()
