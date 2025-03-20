@@ -1,0 +1,1 @@
+ALTER TABLE companies DROP CONSTRAINT IF EXISTS uix_company_name;
