@@ -9,7 +9,7 @@ import (
 
 type UseCase interface {
 	GetCompany(ctx context.Context, id uuid.UUID) (*company.Company, error)
-	CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*company.Company, error)
-	UpdateCompany(ctx context.Context, req dto.UpdateCompanyRequest, id uuid.UUID) (*company.Company, error)
+	CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*dto.CompanyResponse, error)
+	UpdateCompany(ctx context.Context, req dto.UpdatePatchCompanyRequest, id uuid.UUID) (*dto.CompanyResponse, error)
 	DeleteCompany(ctx context.Context, id uuid.UUID) error
 }

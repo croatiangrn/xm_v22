@@ -36,5 +36,10 @@ func main() {
 	companyUseCase := company.NewInteractor(companyRepo, kafkaProducer)
 	companyHandler := httpController.NewCompanyHandler(companyUseCase)
 
-	http.InitRouter(companyHandler, cfg)
+	loginHandler := httpController.NewLoginHandler()
+
+	http.InitRouter(
+		loginHandler,
+		companyHandler,
+		cfg)
 }

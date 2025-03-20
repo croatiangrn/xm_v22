@@ -32,25 +32,25 @@ func (uc *Interactor) GetCompany(ctx context.Context, id uuid.UUID) (*company.Co
 
 // CreateCompany creates a new company
 // We're returning *company.Company (DTO) because it's 1:1 mapping with the domain object
-func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*company.Company, error) {
+func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*dto.CompanyResponse, error) {
 	companyObj := &company.Company{}
 
 	if err := companyObj.AssignName(req.Name); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("name", err.Error())
 	}
 
 	if err := companyObj.AssignDescription(req.Description); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("description", err.Error())
 	}
 
 	if err := companyObj.AssignAmountOfEmployees(req.AmountOfEmployees); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("amount_of_employees", err.Error())
 	}
 
 	companyObj.AssignRegistered(req.Registered)
 
 	if err := companyObj.AssignType(req.Type); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("type", err.Error())
 	}
 
 	if err := uc.repo.Create(ctx, companyObj); err != nil {
@@ -58,33 +58,44 @@ func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRe
 	}
 
 	if err := uc.producer.Publish(ctx, "company-events", event.TypeCreateCompany, companyObj); err != nil {
-		return nil, err
+		return nil, customErrors.NewInternalServerError("company creation", err)
 	}
 
-	return companyObj, nil
+	return uc.toDTO(companyObj), nil
 }
 
-func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRequest, id uuid.UUID) (*company.Company, error) {
+func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdatePatchCompanyRequest, id uuid.UUID) (*dto.CompanyResponse, error) {
 	companyObj, err := uc.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("error finding company: %w", err)
 	}
 
-	if err := companyObj.AssignName(req.Name); err != nil {
-		return nil, err
-	}
-	if err := companyObj.AssignDescription(req.Description); err != nil {
-		return nil, err
-	}
-
-	if err := companyObj.AssignAmountOfEmployees(req.AmountOfEmployees); err != nil {
-		return nil, err
+	if req.Name != nil {
+		if err := companyObj.AssignName(*req.Name); err != nil {
+			return nil, customErrors.NewBadRequestError("name", err.Error())
+		}
 	}
 
-	companyObj.AssignRegistered(req.Registered)
+	if req.Description != nil {
+		if err := companyObj.AssignDescription(*req.Description); err != nil {
+			return nil, customErrors.NewBadRequestError("description", err.Error())
+		}
+	}
 
-	if err := companyObj.AssignType(req.Type); err != nil {
-		return nil, err
+	if req.AmountOfEmployees != nil {
+		if err := companyObj.AssignAmountOfEmployees(*req.AmountOfEmployees); err != nil {
+			return nil, customErrors.NewBadRequestError("amount_of_employees", err.Error())
+		}
+	}
+
+	if req.Registered != nil {
+		companyObj.AssignRegistered(*req.Registered)
+	}
+
+	if req.Type != nil {
+		if err := companyObj.AssignType(*req.Type); err != nil {
+			return nil, customErrors.NewBadRequestError("type", err.Error())
+		}
 	}
 
 	if err := uc.repo.Update(ctx, companyObj); err != nil {
@@ -95,17 +106,28 @@ func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRe
 		return nil, customErrors.NewInternalServerError("company update", err)
 	}
 
-	return companyObj, nil
+	return uc.toDTO(companyObj), nil
 }
 
 func (uc *Interactor) DeleteCompany(ctx context.Context, id uuid.UUID) error {
 	if err := uc.repo.Delete(ctx, id); err != nil {
-		return fmt.Errorf("error deleting company: %w", err)
-	}
-
-	if err := uc.producer.Publish(ctx, "company-events", event.TypeDeleteCompany, &company.Company{ID: id}); err != nil {
 		return err
 	}
 
+	if err := uc.producer.Publish(ctx, "company-events", event.TypeDeleteCompany, &company.Company{ID: id}); err != nil {
+		return customErrors.NewInternalServerError("company delete", err)
+	}
+
 	return nil
+}
+
+func (uc *Interactor) toDTO(companyObj *company.Company) *dto.CompanyResponse {
+	return &dto.CompanyResponse{
+		ID:                companyObj.ID.String(),
+		Name:              companyObj.Name,
+		Description:       companyObj.Description,
+		AmountOfEmployees: companyObj.AmountOfEmployees,
+		Registered:        companyObj.Registered,
+		Type:              companyObj.Type,
+	}
 }

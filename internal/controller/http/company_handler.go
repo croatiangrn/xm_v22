@@ -5,6 +5,7 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/usecase/company"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"log"
 	"net/http"
 )
 
@@ -45,6 +46,7 @@ func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
 	ctx := c.Request.Context()
 	companyObj, err := h.uc.CreateCompany(ctx, req)
 	if err != nil {
+		log.Printf("Error creating company: %v", err)
 		HandleError(c, err)
 		return
 	}
@@ -63,7 +65,7 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
-	var req dto.UpdateCompanyRequest
+	var req dto.UpdatePatchCompanyRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -76,7 +78,7 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, companyObj)
+	c.JSON(http.StatusOK, companyObj)
 }
 
 func (h *CompanyHandler) CompanyDelete(c *gin.Context) {
