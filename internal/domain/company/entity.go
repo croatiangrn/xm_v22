@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"github.com/google/uuid"
+	"time"
 )
 
 const (
@@ -15,12 +16,14 @@ var (
 )
 
 type Company struct {
-	ID                uuid.UUID `json:"id"`
-	Name              string    `json:"name"`
-	Description       string    `json:"description"`
-	AmountOfEmployees int       `json:"amount_of_employees"`
-	Registered        bool      `json:"registered"`
-	Type              string    `json:"type"`
+	ID                uuid.UUID
+	Name              string
+	Description       string
+	AmountOfEmployees int
+	Registered        bool
+	Type              string
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
 }
 
 func (c *Company) AssignName(name string) error {

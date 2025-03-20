@@ -6,9 +6,9 @@ import "context"
 type EventType string
 
 const (
-	EventTypeCreateCompany EventType = "create_company"
-	EventTypeUpdateCompany EventType = "update_company"
-	EventTypeDeleteCompany EventType = "delete_company"
+	TypeCreateCompany EventType = "create_company"
+	TypeUpdateCompany EventType = "update_company"
+	TypeDeleteCompany EventType = "delete_company"
 )
 
 // ProducerInterface defines the interface for a Kafka producer.

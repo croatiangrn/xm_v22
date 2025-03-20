@@ -5,6 +5,7 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/domain/company"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"time"
 )
 
 var _ company.Repository = &CompanyRepository{}
@@ -20,9 +21,9 @@ func NewCompanyRepository(db *pgxpool.Pool) company.Repository {
 func (r *CompanyRepository) FindByID(ctx context.Context, id uuid.UUID) (*company.Company, error) {
 	var c company.Company
 
-	query := `SELECT id, name, description, amount_of_employees, registered, type FROM companies WHERE id = $1`
+	query := `SELECT id, name, description, amount_of_employees, registered, type, created_at, updated_at FROM companies WHERE id = $1 AND deleted_at IS NULL`
 
-	if err := r.db.QueryRow(ctx, query, id).Scan(&c.ID, &c.Name); err != nil {
+	if err := r.db.QueryRow(ctx, query, id).Scan(&c.ID, &c.Name, &c.Description, &c.AmountOfEmployees, &c.Registered, &c.Type, &c.CreatedAt, &c.UpdatedAt); err != nil {
 		return nil, err
 	}
 
@@ -30,14 +31,17 @@ func (r *CompanyRepository) FindByID(ctx context.Context, id uuid.UUID) (*compan
 }
 
 func (r *CompanyRepository) Create(ctx context.Context, c *company.Company) error {
-	query := `INSERT INTO companies (id, name, description, amount_of_employees, registered, type) VALUES ($1, $2, $3, $4, $5, $6)`
+	currentTime := time.Now().UTC()
+	updatedAt := currentTime
+
+	query := `INSERT INTO companies (id, name, description, amount_of_employees, registered, type, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`
 
 	companyUUID, err := uuid.NewV7()
 	if err != nil {
 		return err
 	}
 
-	if _, err := r.db.Exec(ctx, query, companyUUID, c.Name, c.Description, c.AmountOfEmployees, c.Registered, c.Type); err != nil {
+	if _, err := r.db.Exec(ctx, query, companyUUID, c.Name, c.Description, c.AmountOfEmployees, c.Registered, c.Type, currentTime, updatedAt); err != nil {
 		return err
 	}
 
