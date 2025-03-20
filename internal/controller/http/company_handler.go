@@ -5,16 +5,17 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/usecase/company"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
-	"log"
+	"github.com/rs/zerolog"
 	"net/http"
 )
 
 type CompanyHandler struct {
-	uc company.UseCase
+	uc     company.UseCase
+	logger zerolog.Logger
 }
 
-func NewCompanyHandler(uc company.UseCase) *CompanyHandler {
-	return &CompanyHandler{uc}
+func NewCompanyHandler(uc company.UseCase, logger zerolog.Logger) *CompanyHandler {
+	return &CompanyHandler{uc: uc, logger: logger}
 }
 
 func (h *CompanyHandler) CompanyGet(c *gin.Context) {
@@ -29,6 +30,7 @@ func (h *CompanyHandler) CompanyGet(c *gin.Context) {
 
 	comp, err := h.uc.GetCompany(ctx, idAsUUID)
 	if err != nil {
+		h.logger.Err(err).Msg("Error getting company")
 		HandleError(c, err)
 		return
 	}
@@ -46,7 +48,7 @@ func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
 	ctx := c.Request.Context()
 	companyObj, err := h.uc.CreateCompany(ctx, req)
 	if err != nil {
-		log.Printf("Error creating company: %v", err)
+		h.logger.Err(err).Msg("Error creating company")
 		HandleError(c, err)
 		return
 	}
@@ -59,6 +61,7 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 
 	idAsUUID, err := uuid.Parse(id)
 	if err != nil {
+		h.logger.Err(err).Msg("Error parsing ID")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
@@ -68,12 +71,14 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 	var req dto.UpdatePatchCompanyRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
+		h.logger.Err(err).Msg("Error binding JSON")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	companyObj, err := h.uc.UpdateCompany(ctx, req, idAsUUID)
 	if err != nil {
+		h.logger.Err(err).Msg("Error updating company")
 		HandleError(c, err)
 		return
 	}
@@ -87,11 +92,13 @@ func (h *CompanyHandler) CompanyDelete(c *gin.Context) {
 
 	idAsUUID, err := uuid.Parse(id)
 	if err != nil {
+		h.logger.Err(err).Msg("Error parsing ID")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
 
 	if err := h.uc.DeleteCompany(ctx, idAsUUID); err != nil {
+		h.logger.Err(err).Msg("Error deleting company")
 		HandleError(c, err)
 		return
 	}

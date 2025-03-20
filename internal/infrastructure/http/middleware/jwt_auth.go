@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"github.com/croatiangrn/xm_v22/internal/domain/auth"
+	"github.com/croatiangrn/xm_v22/internal/domain/user"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"log"
@@ -53,12 +53,12 @@ func JWTAuthMiddleware(secret string) gin.HandlerFunc {
 				return
 			}
 
-			userObj := auth.User{
+			userObj := user.User{
 				ID:    int64(id),
 				Email: email,
 			}
 
-			c.Set("auth", userObj)
+			c.Set("user", userObj)
 		} else {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
 			return
