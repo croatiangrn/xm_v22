@@ -21,7 +21,12 @@ func NewInteractor(repo company.Repository, producer event.ProducerInterface) *I
 }
 
 func (uc *Interactor) GetCompany(ctx context.Context, id uuid.UUID) (*company.Company, error) {
-	return uc.repo.FindByID(ctx, id)
+	companyObj, err := uc.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("error finding company: %w", err)
+	}
+
+	return companyObj, nil
 }
 
 func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*company.Company, error) {
@@ -49,7 +54,7 @@ func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRe
 		return nil, err
 	}
 
-	if err := uc.producer.Publish(ctx, "company-events", event.EventTypeCreateCompany, companyObj); err != nil {
+	if err := uc.producer.Publish(ctx, "company-events", event.TypeCreateCompany, companyObj); err != nil {
 		return nil, err
 	}
 
@@ -83,7 +88,7 @@ func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRe
 		return nil, err
 	}
 
-	if err := uc.producer.Publish(ctx, "company-events", event.EventTypeUpdateCompany, companyObj); err != nil {
+	if err := uc.producer.Publish(ctx, "company-events", event.TypeUpdateCompany, companyObj); err != nil {
 		return nil, err
 	}
 
@@ -95,7 +100,7 @@ func (uc *Interactor) DeleteCompany(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf("error deleting company: %w", err)
 	}
 
-	if err := uc.producer.Publish(ctx, "company-events", event.EventTypeDeleteCompany, &company.Company{ID: id}); err != nil {
+	if err := uc.producer.Publish(ctx, "company-events", event.TypeDeleteCompany, &company.Company{ID: id}); err != nil {
 		return err
 	}
 
