@@ -6,8 +6,6 @@ import (
 	context "context"
 
 	dto "github.com/croatiangrn/xm_v22/internal/controller/http/dto"
-	domaincompany "github.com/croatiangrn/xm_v22/internal/domain/company"
-
 	mock "github.com/stretchr/testify/mock"
 
 	uuid "github.com/google/uuid"
@@ -67,23 +65,23 @@ func (_m *UseCase) DeleteCompany(ctx context.Context, id uuid.UUID) error {
 }
 
 // GetCompany provides a mock function with given fields: ctx, id
-func (_m *UseCase) GetCompany(ctx context.Context, id uuid.UUID) (*domaincompany.Company, error) {
+func (_m *UseCase) GetCompany(ctx context.Context, id uuid.UUID) (*dto.CompanyResponse, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetCompany")
 	}
 
-	var r0 *domaincompany.Company
+	var r0 *dto.CompanyResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*domaincompany.Company, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*dto.CompanyResponse, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *domaincompany.Company); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *dto.CompanyResponse); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*domaincompany.Company)
+			r0 = ret.Get(0).(*dto.CompanyResponse)
 		}
 	}
 
