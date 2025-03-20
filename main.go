@@ -11,10 +11,21 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/infrastructure/repository"
 	"github.com/croatiangrn/xm_v22/internal/usecase/company"
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/rs/zerolog"
 	"log"
 )
 
+var Logger zerolog.Logger
+
+func initLogger() zerolog.Logger {
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	logger := zerolog.New(zerolog.ConsoleWriter{Out: log.Writer()}).With().Timestamp().Logger()
+	return logger
+}
+
 func main() {
+	Logger = initLogger()
+
 	cfg, err := config.Load("./")
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
@@ -34,7 +45,7 @@ func main() {
 
 	companyRepo := repository.NewCompanyRepository(dbPgxPool)
 	companyUseCase := company.NewInteractor(companyRepo, kafkaProducer)
-	companyHandler := httpController.NewCompanyHandler(companyUseCase)
+	companyHandler := httpController.NewCompanyHandler(companyUseCase, Logger)
 
 	loginHandler := httpController.NewLoginHandler()
 
