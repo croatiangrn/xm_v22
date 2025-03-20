@@ -30,6 +30,8 @@ func (uc *Interactor) GetCompany(ctx context.Context, id uuid.UUID) (*company.Co
 	return companyObj, nil
 }
 
+// CreateCompany creates a new company
+// We're returning *company.Company (DTO) because it's 1:1 mapping with the domain object
 func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*company.Company, error) {
 	companyObj := &company.Company{}
 
