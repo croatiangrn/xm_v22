@@ -22,6 +22,7 @@ func (h *CompanyHandler) CompanyGet(c *gin.Context) {
 	id := c.Param("id")
 	idAsUUID, err := uuid.Parse(id)
 	if err != nil {
+		h.logger.Err(err).Msg("Error parsing ID")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
 		return
 	}
@@ -41,6 +42,7 @@ func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
 	var req dto.CreateCompanyRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
+		h.logger.Err(err).Msg("Error binding JSON")
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
