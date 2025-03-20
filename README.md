@@ -60,15 +60,17 @@ Before you begin, ensure you have the following installed:
 
 The following environment variables are required:
 
-| Variable       | Description                          | Example Value       |
-|----------------|--------------------------------------|---------------------|
-| `DB_HOST`      | Database host address                | `localhost`         |
-| `DB_PORT`      | Database port                        | `5432`              |
-| `DB_USER`      | Database username                    | `your_db_user`      |
-| `DB_PASSWORD`  | Database password                    | `your_db_password`  |
-| `DB_NAME`      | Database name                        | `xm_v22`            |
-| `JWT_SECRET`   | Secret key for JWT token generation  | `your_jwt_secret`   |
-| `SERVER_PORT`  | Port on which the server will run    | `8080`              |
+| Variable        | Description                         | Example Value       |
+|-----------------|-------------------------------------|---------------------|
+| `DB_HOST`       | Database host address               | `localhost`         |
+| `DB_PORT`       | Database port                       | `5432`              |
+| `DB_USER`       | Database username                   | `your_db_user`      |
+| `DB_PASSWORD`   | Database password                   | `your_db_password`  |
+| `DB_NAME`       | Database name                       | `xm_v22`            |
+| `JWT_SECRET`    | Secret key for JWT token generation | `your_jwt_secret`   |
+| `SERVER_PORT`   | Port on which the server will run   | `8080`              |
+| `KAFKA_BROKERS` | Kafka broker                        | `kafka:9092`        |
+| `KAFKA_TOPIC`   | Kafka topic                         | `company-events`    |
 
 ---
 
