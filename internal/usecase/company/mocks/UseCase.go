@@ -5,9 +5,8 @@ package mocks
 import (
 	context "context"
 
-	company "github.com/croatiangrn/xm_v22/internal/domain/company"
-
 	dto "github.com/croatiangrn/xm_v22/internal/controller/http/dto"
+	domaincompany "github.com/croatiangrn/xm_v22/internal/domain/company"
 
 	mock "github.com/stretchr/testify/mock"
 
@@ -20,23 +19,23 @@ type UseCase struct {
 }
 
 // CreateCompany provides a mock function with given fields: ctx, req
-func (_m *UseCase) CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*company.Company, error) {
+func (_m *UseCase) CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*dto.CompanyResponse, error) {
 	ret := _m.Called(ctx, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateCompany")
 	}
 
-	var r0 *company.Company
+	var r0 *dto.CompanyResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, dto.CreateCompanyRequest) (*company.Company, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, dto.CreateCompanyRequest) (*dto.CompanyResponse, error)); ok {
 		return rf(ctx, req)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, dto.CreateCompanyRequest) *company.Company); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, dto.CreateCompanyRequest) *dto.CompanyResponse); ok {
 		r0 = rf(ctx, req)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*company.Company)
+			r0 = ret.Get(0).(*dto.CompanyResponse)
 		}
 	}
 
@@ -68,23 +67,23 @@ func (_m *UseCase) DeleteCompany(ctx context.Context, id uuid.UUID) error {
 }
 
 // GetCompany provides a mock function with given fields: ctx, id
-func (_m *UseCase) GetCompany(ctx context.Context, id uuid.UUID) (*company.Company, error) {
+func (_m *UseCase) GetCompany(ctx context.Context, id uuid.UUID) (*domaincompany.Company, error) {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetCompany")
 	}
 
-	var r0 *company.Company
+	var r0 *domaincompany.Company
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*company.Company, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*domaincompany.Company, error)); ok {
 		return rf(ctx, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *company.Company); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *domaincompany.Company); ok {
 		r0 = rf(ctx, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*company.Company)
+			r0 = ret.Get(0).(*domaincompany.Company)
 		}
 	}
 
@@ -98,27 +97,27 @@ func (_m *UseCase) GetCompany(ctx context.Context, id uuid.UUID) (*company.Compa
 }
 
 // UpdateCompany provides a mock function with given fields: ctx, req, id
-func (_m *UseCase) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRequest, id uuid.UUID) (*company.Company, error) {
+func (_m *UseCase) UpdateCompany(ctx context.Context, req dto.UpdatePatchCompanyRequest, id uuid.UUID) (*dto.CompanyResponse, error) {
 	ret := _m.Called(ctx, req, id)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateCompany")
 	}
 
-	var r0 *company.Company
+	var r0 *dto.CompanyResponse
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, dto.UpdateCompanyRequest, uuid.UUID) (*company.Company, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, dto.UpdatePatchCompanyRequest, uuid.UUID) (*dto.CompanyResponse, error)); ok {
 		return rf(ctx, req, id)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, dto.UpdateCompanyRequest, uuid.UUID) *company.Company); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, dto.UpdatePatchCompanyRequest, uuid.UUID) *dto.CompanyResponse); ok {
 		r0 = rf(ctx, req, id)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*company.Company)
+			r0 = ret.Get(0).(*dto.CompanyResponse)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, dto.UpdateCompanyRequest, uuid.UUID) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, dto.UpdatePatchCompanyRequest, uuid.UUID) error); ok {
 		r1 = rf(ctx, req, id)
 	} else {
 		r1 = ret.Error(1)

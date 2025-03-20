@@ -10,6 +10,7 @@ import (
 
 const (
 	maxDescriptionLength = 3000
+	maxNameLength        = 15
 )
 
 var (
@@ -30,6 +31,10 @@ type Company struct {
 func (c *Company) AssignName(name string) error {
 	if name == "" {
 		return errors.New("name cannot be empty")
+	}
+
+	if len(name) > maxNameLength {
+		return fmt.Errorf("name is too long, max length is %d", maxNameLength)
 	}
 
 	c.Name = name

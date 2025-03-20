@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 	customErrors "github.com/croatiangrn/xm_v22/internal/pkg/errors"
+	"github.com/google/uuid"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,7 +15,6 @@ import (
 	"github.com/stretchr/testify/mock"
 
 	"github.com/croatiangrn/xm_v22/internal/controller/http/dto"
-	"github.com/croatiangrn/xm_v22/internal/domain/company"
 	"github.com/croatiangrn/xm_v22/internal/usecase/company/mocks"
 )
 
@@ -29,11 +30,13 @@ func TestCompanyCreate(t *testing.T) {
 	router := gin.Default()
 	router.POST("/companies", h.CompanyCreate)
 
+	mockUUID, _ := uuid.Parse("00000000-0000-0000-0000-000000000000")
+
 	// Test cases
 	tests := []struct {
 		name           string
 		requestBody    interface{} // Use interface{} to allow invalid JSON
-		mockResponse   *company.Company
+		mockResponse   *dto.CompanyResponse
 		mockError      error
 		expectedStatus int
 		expectedBody   interface{} // Use interface{} to handle both *company.Company and gin.H
@@ -47,7 +50,8 @@ func TestCompanyCreate(t *testing.T) {
 				Registered:        false,
 				Type:              "Corporations",
 			},
-			mockResponse: &company.Company{
+			mockResponse: &dto.CompanyResponse{
+				ID:                mockUUID.String(),
 				Name:              "Test Company",
 				Description:       "Test description",
 				AmountOfEmployees: 10,
@@ -56,7 +60,7 @@ func TestCompanyCreate(t *testing.T) {
 			},
 			mockError:      nil,
 			expectedStatus: http.StatusCreated,
-			expectedBody: &company.Company{
+			expectedBody: &dto.CompanyResponse{
 				Name:              "Test Company",
 				Description:       "Test description",
 				AmountOfEmployees: 10,
@@ -132,9 +136,8 @@ func TestCompanyCreate(t *testing.T) {
 
 				// Handle different types of expectedBody
 				switch expected := tt.expectedBody.(type) {
-				case *company.Company:
-					// For success cases, unmarshal into company.Company and compare fields
-					var actual company.Company
+				case *dto.CompanyResponse:
+					var actual dto.CompanyResponse
 					err := json.Unmarshal(rr.Body.Bytes(), &actual)
 					assert.NoError(t, err)
 					assert.Equal(t, expected.Name, actual.Name)
@@ -145,6 +148,7 @@ func TestCompanyCreate(t *testing.T) {
 				case map[string]interface{}:
 					assert.Equal(t, expected, responseBody)
 				default:
+					log.Printf("Type: %T", expected)
 					t.Fatalf("Unexpected type for expectedBody: %T", expected)
 				}
 			}
