@@ -36,11 +36,11 @@ func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRe
 	companyObj := &company.Company{}
 
 	if err := companyObj.AssignName(req.Name); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("name", err.Error())
 	}
 
 	if err := companyObj.AssignDescription(req.Description); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("description", err.Error())
 	}
 
 	if err := companyObj.AssignAmountOfEmployees(req.AmountOfEmployees); err != nil {
@@ -50,7 +50,7 @@ func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRe
 	companyObj.AssignRegistered(req.Registered)
 
 	if err := companyObj.AssignType(req.Type); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("type", err.Error())
 	}
 
 	if err := uc.repo.Create(ctx, companyObj); err != nil {
@@ -58,7 +58,7 @@ func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRe
 	}
 
 	if err := uc.producer.Publish(ctx, "company-events", event.TypeCreateCompany, companyObj); err != nil {
-		return nil, err
+		return nil, customErrors.NewInternalServerError("company creation", err)
 	}
 
 	return companyObj, nil
@@ -71,20 +71,20 @@ func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRe
 	}
 
 	if err := companyObj.AssignName(req.Name); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("name", err.Error())
 	}
 	if err := companyObj.AssignDescription(req.Description); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("description", err.Error())
 	}
 
 	if err := companyObj.AssignAmountOfEmployees(req.AmountOfEmployees); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("amount_of_employees", err.Error())
 	}
 
 	companyObj.AssignRegistered(req.Registered)
 
 	if err := companyObj.AssignType(req.Type); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("type", err.Error())
 	}
 
 	if err := uc.repo.Update(ctx, companyObj); err != nil {
@@ -100,11 +100,11 @@ func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRe
 
 func (uc *Interactor) DeleteCompany(ctx context.Context, id uuid.UUID) error {
 	if err := uc.repo.Delete(ctx, id); err != nil {
-		return fmt.Errorf("error deleting company: %w", err)
+		return err
 	}
 
 	if err := uc.producer.Publish(ctx, "company-events", event.TypeDeleteCompany, &company.Company{ID: id}); err != nil {
-		return err
+		return customErrors.NewInternalServerError("company delete", err)
 	}
 
 	return nil
