@@ -10,6 +10,6 @@ import (
 type UseCase interface {
 	GetCompany(ctx context.Context, id uuid.UUID) (*company.Company, error)
 	CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*company.Company, error)
-	UpdateCompany(ctx context.Context, obj *company.Company, req dto.UpdateCompanyRequest) error
+	UpdateCompany(ctx context.Context, req dto.UpdateCompanyRequest, id uuid.UUID) (*company.Company, error)
 	DeleteCompany(ctx context.Context, id uuid.UUID) error
 }

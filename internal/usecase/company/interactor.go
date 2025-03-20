@@ -44,22 +44,38 @@ func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRe
 	return companyObj, nil
 }
 
-func (uc *Interactor) UpdateCompany(ctx context.Context, companyObj *company.Company, req dto.UpdateCompanyRequest) error {
-	companyObj.Name = req.Name
-	companyObj.Description = req.Description
-	companyObj.AmountOfEmployees = req.AmountOfEmployees
-	companyObj.Registered = req.Registered
-	companyObj.Type = req.Type
+func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRequest, id uuid.UUID) (*company.Company, error) {
+	companyObj, err := uc.repo.FindByID(ctx, id)
+	if err != nil {
+		return nil, fmt.Errorf("error finding company: %w", err)
+	}
+
+	if err := companyObj.AssignName(req.Name); err != nil {
+		return nil, err
+	}
+	if err := companyObj.AssignDescription(req.Description); err != nil {
+		return nil, err
+	}
+
+	if err := companyObj.AssignAmountOfEmployees(req.AmountOfEmployees); err != nil {
+		return nil, err
+	}
+
+	companyObj.AssignRegistered(req.Registered)
+
+	if err := companyObj.AssignType(req.Type); err != nil {
+		return nil, err
+	}
 
 	if err := uc.repo.Update(ctx, companyObj); err != nil {
-		return err
+		return nil, err
 	}
 
 	if err := uc.producer.Publish(ctx, "company-events", event.EventTypeUpdateCompany, companyObj); err != nil {
-		return err
+		return nil, err
 	}
 
-	return nil
+	return companyObj, nil
 }
 
 func (uc *Interactor) DeleteCompany(ctx context.Context, id uuid.UUID) error {
