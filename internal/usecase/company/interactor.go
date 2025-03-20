@@ -6,6 +6,7 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/controller/http/dto"
 	"github.com/croatiangrn/xm_v22/internal/domain/company"
 	"github.com/croatiangrn/xm_v22/internal/domain/event"
+	customErrors "github.com/croatiangrn/xm_v22/internal/pkg/errors"
 	"github.com/google/uuid"
 )
 
@@ -29,6 +30,8 @@ func (uc *Interactor) GetCompany(ctx context.Context, id uuid.UUID) (*company.Co
 	return companyObj, nil
 }
 
+// CreateCompany creates a new company
+// We're returning *company.Company (DTO) because it's 1:1 mapping with the domain object
 func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRequest) (*company.Company, error) {
 	companyObj := &company.Company{}
 
@@ -89,7 +92,7 @@ func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRe
 	}
 
 	if err := uc.producer.Publish(ctx, "company-events", event.TypeUpdateCompany, companyObj); err != nil {
-		return nil, err
+		return nil, customErrors.NewInternalServerError("company update", err)
 	}
 
 	return companyObj, nil
