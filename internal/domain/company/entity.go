@@ -3,6 +3,7 @@ package company
 import (
 	"errors"
 	"fmt"
+	customErrors "github.com/croatiangrn/xm_v22/internal/pkg/errors"
 	"github.com/google/uuid"
 	"time"
 )
@@ -46,7 +47,7 @@ func (c *Company) AssignDescription(description string) error {
 
 func (c *Company) AssignAmountOfEmployees(amount int) error {
 	if amount < 0 {
-		return errors.New("amount of employees cannot be negative")
+		return customErrors.NewBadRequestError("amount_of_employees", "amount of employees cannot be negative")
 	}
 
 	c.AmountOfEmployees = amount

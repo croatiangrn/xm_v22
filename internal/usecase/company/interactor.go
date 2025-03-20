@@ -44,7 +44,7 @@ func (uc *Interactor) CreateCompany(ctx context.Context, req dto.CreateCompanyRe
 	}
 
 	if err := companyObj.AssignAmountOfEmployees(req.AmountOfEmployees); err != nil {
-		return nil, err
+		return nil, customErrors.NewBadRequestError("amount_of_employees", err.Error())
 	}
 
 	companyObj.AssignRegistered(req.Registered)
