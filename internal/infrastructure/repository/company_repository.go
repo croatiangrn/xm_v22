@@ -74,7 +74,7 @@ func (r *CompanyRepository) Update(ctx context.Context, obj *company.Company) er
 }
 
 func (r *CompanyRepository) Delete(ctx context.Context, id uuid.UUID) error {
-	query := `DELETE FROM companies WHERE id = $1`
+	query := `UPDATE companies SET deleted_at = NOW() WHERE id = $1`
 
 	if _, err := r.db.Exec(ctx, query, id); err != nil {
 		return customErrors.NewInternalServerError("company delete", err)
