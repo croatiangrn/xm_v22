@@ -21,13 +21,13 @@ func NewInteractor(repo company.Repository, producer event.ProducerInterface) *I
 	return &Interactor{repo: repo, producer: producer}
 }
 
-func (uc *Interactor) GetCompany(ctx context.Context, id uuid.UUID) (*company.Company, error) {
+func (uc *Interactor) GetCompany(ctx context.Context, id uuid.UUID) (*dto.CompanyResponse, error) {
 	companyObj, err := uc.repo.FindByID(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("error finding company: %w", err)
 	}
 
-	return companyObj, nil
+	return uc.toDTO(companyObj), nil
 }
 
 // CreateCompany creates a new company
