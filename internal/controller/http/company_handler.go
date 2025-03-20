@@ -63,12 +63,6 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 
 	ctx := c.Request.Context()
 
-	companyObj, err := h.uc.GetCompany(ctx, idAsUUID)
-	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Company not found"})
-		return
-	}
-
 	var req dto.UpdateCompanyRequest
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -76,7 +70,8 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 		return
 	}
 
-	if err := h.uc.UpdateCompany(ctx, companyObj, req); err != nil {
+	companyObj, err := h.uc.UpdateCompany(ctx, req, idAsUUID)
+	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
