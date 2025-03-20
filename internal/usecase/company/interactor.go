@@ -6,6 +6,7 @@ import (
 	"github.com/croatiangrn/xm_v22/internal/controller/http/dto"
 	"github.com/croatiangrn/xm_v22/internal/domain/company"
 	"github.com/croatiangrn/xm_v22/internal/domain/event"
+	customErrors "github.com/croatiangrn/xm_v22/internal/pkg/errors"
 	"github.com/google/uuid"
 )
 
@@ -89,7 +90,7 @@ func (uc *Interactor) UpdateCompany(ctx context.Context, req dto.UpdateCompanyRe
 	}
 
 	if err := uc.producer.Publish(ctx, "company-events", event.TypeUpdateCompany, companyObj); err != nil {
-		return nil, err
+		return nil, customErrors.NewInternalServerError("company update", err)
 	}
 
 	return companyObj, nil

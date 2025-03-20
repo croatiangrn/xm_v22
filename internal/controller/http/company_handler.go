@@ -28,7 +28,7 @@ func (h *CompanyHandler) CompanyGet(c *gin.Context) {
 
 	comp, err := h.uc.GetCompany(ctx, idAsUUID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Company not found"})
+		HandleError(c, err)
 		return
 	}
 	c.JSON(http.StatusOK, comp)
@@ -45,7 +45,7 @@ func (h *CompanyHandler) CompanyCreate(c *gin.Context) {
 	ctx := c.Request.Context()
 	companyObj, err := h.uc.CreateCompany(ctx, req)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		HandleError(c, err)
 		return
 	}
 
@@ -72,7 +72,7 @@ func (h *CompanyHandler) CompanyUpdate(c *gin.Context) {
 
 	companyObj, err := h.uc.UpdateCompany(ctx, req, idAsUUID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		HandleError(c, err)
 		return
 	}
 
@@ -90,7 +90,7 @@ func (h *CompanyHandler) CompanyDelete(c *gin.Context) {
 	}
 
 	if err := h.uc.DeleteCompany(ctx, idAsUUID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		HandleError(c, err)
 		return
 	}
 
