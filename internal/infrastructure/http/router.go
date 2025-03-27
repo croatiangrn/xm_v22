@@ -11,7 +11,7 @@ import (
 func InitRouter(
 	loginHandler *httpController.LoginHandler,
 	companyHandler *httpController.CompanyHandler,
-	cfg config.Config) {
+	cfg config.Config) *gin.Engine {
 	router := gin.Default()
 
 	corsConfig := cors.DefaultConfig()
@@ -35,9 +35,5 @@ func InitRouter(
 		}
 	}
 
-	// Run the server
-	err := router.Run(cfg.ServerPort)
-	if err != nil {
-		return
-	}
+	return router
 }
