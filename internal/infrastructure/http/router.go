@@ -14,6 +14,8 @@ func InitRouter(
 	cfg config.Config) *gin.Engine {
 	router := gin.Default()
 
+	router.Use(gin.Recovery())
+
 	corsConfig := cors.DefaultConfig()
 	corsConfig.AllowHeaders = append(corsConfig.AllowHeaders, "Authorization")
 	corsConfig.AllowOrigins = []string{"*"} // This should be replaced with an actual frontend URL for example
